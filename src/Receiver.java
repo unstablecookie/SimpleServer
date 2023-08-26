@@ -15,6 +15,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Scanner;
 
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.File;
+import java.io.BufferedInputStream;
 
 public class Receiver {
 
@@ -77,7 +82,16 @@ public class Receiver {
 	static class MyFileHandler implements HttpHandler{
 		@Override
 		public void handle(HttpExchange httpexchange) throws IOException {
-
+			Headers requestHeaders = httpexchange.getRequestHeaders();
+			File file = new File("/168.jpg");
+			try(InputStream in  = httpexchange.getRequestBody()){
+				FileOutputStream fout = new FileOutputStream(file,false);
+				BufferedInputStream bin = new BufferedInputStream(in);
+				int read;
+				while((read = bin.read())!=-1){
+					fout.write(read);
+				}
+			}
 		}
 	}
 	
