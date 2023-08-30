@@ -91,6 +91,7 @@ public class Receiver {
 			List<String> listrl = map.get("Real-length");
 			List<String> listcl = map.get("Content-length");
 			List<String> listbd = map.get("Content-type");
+			List<String> listfn = map.get("File-name");
 			long realLength = Long.parseLong(listrl.get(0));
 			long contentLength = Long.parseLong(listcl.get(0));
 			String[] boundaryParser = listbd.get(0).split(" ");
@@ -98,7 +99,8 @@ public class Receiver {
 			System.out.println("realLength:"+realLength);
 			System.out.println("contentLength:"+contentLength);
 			System.out.println(" boundary parser :" + boundary + " length:"+boundary.length());
-			File file = new File("168.jpg");
+			System.out.println(" file name :" + listfn.get(0));
+			File file = new File(listfn.get(0));
 			try(InputStream in  = httpexchange.getRequestBody();
 					FileOutputStream out = new FileOutputStream(file)){
 				for(int i=0;i<contentLength-(realLength+boundary.length()+8);i++)  in.read();//skip header
@@ -121,7 +123,6 @@ public class Receiver {
 					}
 					out.write(buffer,0,bytesRead);
 				}
-				//java.nio.file.Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				System.out.println(" file copied");
 			}
 			
@@ -134,14 +135,6 @@ public class Receiver {
 			out.flush();
 			out.close();
 			
-			/*try(InputStream in  = httpexchange.getRequestBody()){
-				FileOutputStream fout = new FileOutputStream(file,false);
-				BufferedInputStream bin = new BufferedInputStream(in);
-				int read;
-				while((read = bin.read())!=-1){
-					fout.write(read);
-				}
-			}*/
 		}
 	}
 	
