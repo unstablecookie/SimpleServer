@@ -1,4 +1,3 @@
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.InputStream;
@@ -10,6 +9,9 @@ import java.net.HttpURLConnection;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+
+
+
 import com.sun.net.httpserver.Headers;
 
 import java.io.ByteArrayInputStream;
@@ -25,74 +27,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Arrays;
+import com.sun.net.httpserver.HttpServer;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ExecutionException;
-
-public class Receiver {
-
-	public static void main(String[] args) throws Exception {
-		/*HttpServer server = HttpServer.create(new InetSocketAddress(8001),0);
-		//server.createContext("/testget",new MyHandler());
-		//server.createContext("/testpost",new MyPostHandler());
-		server.createContext("/testfile",new MyOldFileHandler());
-		server.setExecutor(null);
-		server.start();*/
-		int portNumber = 8001;
-		ExecutorService executor = Executors.newFixedThreadPool(4);
-		executor.execute(new FileProcessor(portNumber++));
-		executor.execute(new FileProcessor(portNumber++));
-		executor.execute(new FileProcessor(portNumber++));
-		executor.execute(new FileProcessor(portNumber++));
+public class FileProcessor implements Runnable{
+	
+	int portNumber ;
+	
+	public FileProcessor(int portNumber) {
+		this.portNumber = portNumber;
 	}
 	
-	static class MyHandler implements HttpHandler {
-		@Override
-		public void handle(HttpExchange ex) throws IOException{
-			String resp = "i got ur message";
-			ex.sendResponseHeaders(200,resp.length());//response.length() is bad, it should have been response.getBytes().length
-			try(OutputStream out = ex.getResponseBody()){
-				out.write(resp.getBytes());
-				out.flush();
-				out.close();
-			}			
-			
+	@Override
+	public void run() {
+		try {
+			HttpServer server = HttpServer.create(new InetSocketAddress(portNumber),0);
+			server.createContext("/testfile",new MyFileHandler());
+			server.setExecutor(null);
+			server.start();
+			System.out.println("running with "+portNumber+" portNumber");
+		}catch(IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
-	static class MyPostHandler implements HttpHandler {
+	static class MyFileHandler implements HttpHandler{
 		@Override
 		public void handle(HttpExchange httpexchange) throws IOException {
-			if(httpexchange.getRequestMethod().equalsIgnoreCase("POST")) {
-				try {
-					Headers requestHeaders = httpexchange.getRequestHeaders();
-					
-					InputStream in = httpexchange.getRequestBody();
-					Scanner s = new Scanner(in).useDelimiter("\\A");
-					String result = s.hasNext() ? s.next() : "" ;			
-					in.close();
-					System.out.println(result);
-					//response
-					String responseString = "POST OK";
-					Headers responseHeaders = httpexchange.getResponseHeaders();
-					httpexchange.sendResponseHeaders(200,responseString.length());
-					OutputStream out = httpexchange.getResponseBody();
-					out.write(responseString.length());
-					out.flush();
-					out.close();
-				}catch (NumberFormatException | IOException e) {
-					e.printStackTrace();
-				}
-			}
-
-		}
-	}
-	
-	static class MyOldFileHandler implements HttpHandler{
-		@Override
-		public void handle(HttpExchange httpexchange) throws IOException {
+			System.out.println("responding..");
 			Map<String,List<String>> map = httpexchange.getRequestHeaders();
 			Set<Map.Entry<String,List<String>>> set = map.entrySet();
 			for(Map.Entry entry : set) {
@@ -138,16 +99,26 @@ public class Receiver {
 			}
 			
 			//responce
-			String responseString = "POST OK";
-			Headers responseHeaders = httpexchange.getResponseHeaders();
-			httpexchange.sendResponseHeaders(200,responseString.length());
-			OutputStream out = httpexchange.getResponseBody();
-			out.write(responseString.length());
-			out.flush();
-			out.close();
+			System.out.println("file.length()"+file.length());
+			if(file.length()!=realLength) {//if file is copied
+				String responseString = "NOT OK";
+				Headers responseHeaders = httpexchange.getResponseHeaders();
+				httpexchange.sendResponseHeaders(404,responseString.length());
+				OutputStream out = httpexchange.getResponseBody();
+				out.write(responseString.length());
+				out.flush();
+				out.close();
+			}else {
+				String responseString = "POST OK";
+				Headers responseHeaders = httpexchange.getResponseHeaders();
+				httpexchange.sendResponseHeaders(200,responseString.length());
+				OutputStream out = httpexchange.getResponseBody();
+				out.write(responseString.length());
+				out.flush();
+				out.close();
+			}
+			
 			
 		}
 	}
-	
-	
 }
