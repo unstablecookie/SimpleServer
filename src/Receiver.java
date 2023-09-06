@@ -2,44 +2,24 @@
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.net.InetSocketAddress;
-import java.nio.file.StandardCopyOption;
-import java.net.HttpURLConnection;
-
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.Headers;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.Scanner;
-
 import java.io.FileOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.File;
-import java.io.BufferedInputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Arrays;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ExecutionException;
 
 public class Receiver {
 
 	public static void main(String[] args) throws Exception {
-		/*HttpServer server = HttpServer.create(new InetSocketAddress(8001),0);
-		//server.createContext("/testget",new MyHandler());
-		//server.createContext("/testpost",new MyPostHandler());
-		server.createContext("/testfile",new MyOldFileHandler());
-		server.setExecutor(null);
-		server.start();*/
+
 		int portNumber = 8001;
 		ExecutorService executor = Executors.newFixedThreadPool(4);
 		executor.execute(new FileProcessor(portNumber++));
