@@ -1,33 +1,17 @@
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.net.InetSocketAddress;
-import java.nio.file.StandardCopyOption;
-import java.net.HttpURLConnection;
-
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-
-
-
 import com.sun.net.httpserver.Headers;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.Scanner;
-
 import java.io.FileOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.File;
-import java.io.BufferedInputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Arrays;
-import com.sun.net.httpserver.HttpServer;
 
 public class FileProcessor implements Runnable{
 	

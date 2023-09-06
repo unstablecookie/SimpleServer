@@ -45,7 +45,7 @@ public class Receiver {
 		executor.execute(new FileProcessor(portNumber++));
 		executor.execute(new FileProcessor(portNumber++));
 		executor.execute(new FileProcessor(portNumber++));
-		executor.execute(new FileProcessor(portNumber++));
+		executor.execute(new FileProcessor(portNumber));
 	}
 	
 	static class MyHandler implements HttpHandler {
